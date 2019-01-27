@@ -1,6 +1,6 @@
 # The Most Of Us
 
-Demake of a popular game.
+PICO-8 demake of a popular game.
 
 ## Dev Environment
 
