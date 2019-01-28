@@ -26,10 +26,22 @@ function require_game_objects()
             return new_game_object
         end,
 
+        get_by_name = function(self, name)
+            return objects[name]
+        end,
+
         init = function()
             for component in all(components) do
                 if component.init then
                     component:init()
+                end
+            end
+        end,
+
+        late_init = function()
+            for component in all(components) do
+                if component.late_init then
+                    component:late_init()
                 end
             end
         end,
@@ -46,6 +58,14 @@ function require_game_objects()
             for component in all(components) do
                 if component.draw then
                     component:draw()
+                end
+            end
+        end,
+
+        late_draw = function()
+            for component in all(components) do
+                if component.late_draw then
+                    component:late_draw()
                 end
             end
         end
