@@ -9,16 +9,27 @@ function new_player_comp(speed)
     end,
 
     update = function(self)
-      if (btn(0)) then
+      local move_left = btn(0)
+      local move_right = btn(1)
+      local move_up = btn(2)
+      local move_down = btn(3)
+
+      if move_left then
         self.position.x -= speed
-        self.sprite:set_direction_left(true)
+        self.sprite:flip(true)
       end
-      if (btn(1)) then
+      if move_right then
         self.position.x += speed
-        self.sprite:set_direction_left(false)
+        self.sprite:flip(false)
       end
-      if (btn(2)) then self.position.y -= speed end
-      if (btn(3)) then self.position.y += speed end
+      if move_up then self.position.y -= speed end
+      if move_down then self.position.y += speed end
+
+      if (move_left or move_right or move_up or move_down) then
+        self.sprite:set_animation("walk")
+      else
+        self.sprite:set_animation("idle")
+      end
     end,
   }
 end

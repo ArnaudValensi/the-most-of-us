@@ -37,38 +37,50 @@ function new_player_comp(speed)
     end,
 
     update = function(self)
-      if (btn(0)) then
+      local move_left = btn(0)
+      local move_right = btn(1)
+      local move_up = btn(2)
+      local move_down = btn(3)
+
+      if move_left then
         self.position.x -= speed
-        self.sprite:set_direction_left(true)
+        self.sprite:flip(true)
       end
-      if (btn(1)) then
+      if move_right then
         self.position.x += speed
-        self.sprite:set_direction_left(false)
+        self.sprite:flip(false)
       end
-      if (btn(2)) then self.position.y -= speed end
-      if (btn(3)) then self.position.y += speed end
+      if move_up then self.position.y -= speed end
+      if move_down then self.position.y += speed end
+
+      if (move_left or move_right or move_up or move_down) then
+        self.sprite:set_animation("walk")
+      else
+        self.sprite:set_animation("idle")
+      end
     end,
   }
 end
 function new_sprite_comp(options)
+  local animations = options.animations
+  local time_per_sprite = options.time_per_sprite or 15
+  local width_in_cell = options.width_in_cell or 1
+  local height_in_cell = options.height_in_cell or 1
   local frame_count = 0
   local current_sprite = 1
+  local current_animation_name = nil
+  local current_animation = animations[options.default]
   local flip = false
 
   return {
     name = "sprite",
-    sprites = options.sprites,
-    time_per_sprite = options.time_per_sprite or 15,
-    width_in_cell = options.width_in_cell or 1,
-    height_in_cell = options.height_in_cell or 1,
-
     init = function(self)
       self.position = self.game_object:get_component("transform").position
     end,
 
     update = function(self)
-      if self.time_per_sprite == frame_count then
-        current_sprite = current_sprite % #self.sprites + 1
+      if time_per_sprite == frame_count then
+        current_sprite = current_sprite % #current_animation + 1
         frame_count = 0
       else
         frame_count += 1
@@ -77,17 +89,25 @@ function new_sprite_comp(options)
 
     draw = function(self)
       spr(
-        self.sprites[current_sprite],
+        current_animation[current_sprite],
         self.position.x,
         self.position.y,
-        self.width_in_cell,
-        self.height_in_cell,
+        width_in_cell,
+        height_in_cell,
         flip
       )
     end,
 
-    set_direction_left = function(self, is_left)
+    flip = function(self, is_left)
       flip = is_left
+    end,
+
+    set_animation = function(self, animation_name)
+      if current_animation_name != animation_name then
+        current_animation = animations[animation_name]
+        current_animation_name = animation_name
+        current_sprite = 1
+      end
     end,
   }
 end
@@ -155,6 +175,21 @@ end
 function lerp(a, b, t)
   return a + (b - a) * t
 end
+function to_string(any)
+  if type(any)=="function" then return "function" end
+  if any==nil then return "nil" end
+  if type(any)=="string" then return any end
+  if type(any)=="boolean" then return any and "true" or "false" end
+  if type(any)=="number" then return ""..any end
+  if type(any)=="table" then -- recursion
+    local str = "{ "
+    for k,v in pairs(any) do
+      str=str..tostring(k).."->"..tostring(v).." "
+    end
+    return str.."}"
+  end
+  return "unkown" -- should never show
+end
 function new_vec(x, y)
     return {
         x = x,
@@ -165,7 +200,13 @@ gameobjects = require_game_objects()
 
 local player = gameobjects:new("player")
 player:add_component(new_transform_comp(1 * 8, 0))
-player:add_component(new_sprite_comp({ sprites = {64, 65} }))
+player:add_component(new_sprite_comp({
+  animations = {
+    ["idle"] = {64} ,
+    ["walk"] = {64, 65},
+  },
+  default = "idle",
+}))
 player:add_component(new_player_comp(3))
 
 local cam = gameobjects:new("camera")
