@@ -10,6 +10,7 @@ player:add_component(new_sprite_comp({
   default = "idle",
 }))
 player:add_component(new_player_comp(3))
+player:add_component(new_line_of_sight_comp())
 
 local cam = gameobjects:new("camera")
 cam:add_component(new_transform_comp(0, 0))

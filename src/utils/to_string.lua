@@ -7,7 +7,7 @@ function to_string(any)
   if type(any)=="table" then -- recursion
     local str = "{ "
     for k,v in pairs(any) do
-      str=str..tostring(k).."->"..tostring(v).." "
+      str=str..to_string(k).."->"..to_string(v).." "
     end
     return str.."}"
   end
