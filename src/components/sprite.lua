@@ -1,6 +1,7 @@
 function new_sprite_comp(options)
   local frame_count = 0
   local current_sprite = 1
+  local flip = false
 
   return {
     name = "sprite",
@@ -28,8 +29,13 @@ function new_sprite_comp(options)
         self.position.x,
         self.position.y,
         self.width_in_cell,
-        self.height_in_cell
+        self.height_in_cell,
+        flip
       )
+    end,
+
+    set_direction_left = function(self, is_left)
+      flip = is_left
     end,
   }
 end
