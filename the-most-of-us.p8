@@ -1,6 +1,31 @@
 pico-8 cartridge // http://www.pico-8.com
 version 16
 __lua__
+function new_follow_comp(options)
+  return {
+    name = "follow",
+    target = options.target,
+    smooth_speed = options.smooth_speed or 0.2,
+
+    init = function(self)
+      self.target_position = self.target:get_component("transform").position
+      self.position = self.game_object:get_component("transform").position
+    end,
+
+    update = function(self)
+      local position = self.position
+      position.x = lerp(position.x, self.target_position.x, self.smooth_speed)
+      position.y = lerp(position.y, self.target_position.y, self.smooth_speed)
+    end,
+
+    draw = function(self)
+      camera(
+        self.position.x - 64,
+        self.position.y - 64
+      )
+    end,
+  }
+end
 function new_player_comp(speed)
   speed = speed or 1
   return {
@@ -101,6 +126,9 @@ function require_game_objects()
 
     return game_objects
 end
+function lerp(a, b, t)
+  return a + (b - a) * t
+end
 function new_vec(x, y)
     return {
         x = x,
@@ -114,8 +142,11 @@ player:add_component(new_transform_comp(1 * 8, 0))
 player:add_component(new_sprite_comp({ sprite_number = 64 }))
 player:add_component(new_player_comp(3))
 
+local cam = gameobjects:new("camera")
+cam:add_component(new_transform_comp(0, 0))
+cam:add_component(new_follow_comp({ target = player }))
+
 function _init()
-  printh('\n== init ==', 'log', true)
   gameobjects:init()
 end
 
