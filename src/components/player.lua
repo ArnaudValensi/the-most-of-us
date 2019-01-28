@@ -4,28 +4,40 @@ function new_player_comp(speed)
     name = "player",
 
     init = function(self)
-      self.position = self.game_object:get_component("transform").position
+      self.transform = self.game_object:get_component("transform")
       self.sprite = self.game_object:get_component("sprite")
     end,
 
     update = function(self)
+      local position = self.transform.position
+      local size = self.transform.size
       local move_left = btn(0)
       local move_right = btn(1)
       local move_up = btn(2)
       local move_down = btn(3)
+      local new_position = new_vec(position.x, position.y)
 
       if move_left then
-        self.position.x -= speed
+        new_position.x -= speed
         self.sprite:flip(true)
       end
       if move_right then
-        self.position.x += speed
+        new_position.x += speed
         self.sprite:flip(false)
       end
-      if move_up then self.position.y -= speed end
-      if move_down then self.position.y += speed end
+      if move_up then new_position.y -= speed end
+      if move_down then new_position.y += speed end
 
-      if (move_left or move_right or move_up or move_down) then
+      local want_move = not new_position:equal(position)
+      local has_moved = false
+
+      if want_move and not is_transform_colliding_map_cell(new_position, size) then
+        position.x = new_position.x
+        position.y = new_position.y
+        has_moved = true
+      end
+
+      if (has_moved) then
         self.sprite:set_animation("walk")
       else
         self.sprite:set_animation("idle")

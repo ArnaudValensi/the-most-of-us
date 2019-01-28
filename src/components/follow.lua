@@ -13,9 +13,7 @@ function new_follow_comp(options)
       local position = self.position
       position.x = lerp(position.x, self.target_position.x, self.smooth_speed)
       position.y = lerp(position.y, self.target_position.y, self.smooth_speed)
-    end,
 
-    draw = function(self)
       camera(
         self.position.x - 64,
         self.position.y - 64

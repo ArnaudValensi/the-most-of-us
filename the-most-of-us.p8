@@ -16,9 +16,7 @@ function new_follow_comp(options)
       local position = self.position
       position.x = lerp(position.x, self.target_position.x, self.smooth_speed)
       position.y = lerp(position.y, self.target_position.y, self.smooth_speed)
-    end,
 
-    draw = function(self)
       camera(
         self.position.x - 64,
         self.position.y - 64
@@ -32,28 +30,40 @@ function new_player_comp(speed)
     name = "player",
 
     init = function(self)
-      self.position = self.game_object:get_component("transform").position
+      self.transform = self.game_object:get_component("transform")
       self.sprite = self.game_object:get_component("sprite")
     end,
 
     update = function(self)
+      local position = self.transform.position
+      local size = self.transform.size
       local move_left = btn(0)
       local move_right = btn(1)
       local move_up = btn(2)
       local move_down = btn(3)
+      local new_position = new_vec(position.x, position.y)
 
       if move_left then
-        self.position.x -= speed
+        new_position.x -= speed
         self.sprite:flip(true)
       end
       if move_right then
-        self.position.x += speed
+        new_position.x += speed
         self.sprite:flip(false)
       end
-      if move_up then self.position.y -= speed end
-      if move_down then self.position.y += speed end
+      if move_up then new_position.y -= speed end
+      if move_down then new_position.y += speed end
 
-      if (move_left or move_right or move_up or move_down) then
+      local want_move = not new_position:equal(position)
+      local has_moved = false
+
+      if want_move and not is_transform_colliding_map_cell(new_position, size) then
+        position.x = new_position.x
+        position.y = new_position.y
+        has_moved = true
+      end
+
+      if (has_moved) then
         self.sprite:set_animation("walk")
       else
         self.sprite:set_animation("idle")
@@ -111,11 +121,39 @@ function new_sprite_comp(options)
     end,
   }
 end
-function new_transform_comp(x, y)
+function new_transform_comp(x, y, size_x, size_y)
   return {
     name = "transform",
     position = new_vec(x, y),
+    size = new_vec(size_x, size_y)
   }
+end
+function is_transform_colliding_map_cell(position, size)
+  function is_vec_colliding_cell(vec)
+    return fget(mget(vec.x / 8, vec.y / 8), 0)
+  end
+
+  local top_left = new_vec(
+    position.x,
+    position.y
+  )
+  local top_right = new_vec(
+    position.x + size.x - 1,
+    position.y
+  )
+  local bottom_right = new_vec(
+    position.x + size.x - 1,
+    position.y + size.y - 1
+  )
+  local bottom_left = new_vec(
+    position.x,
+    position.y + size.y - 1
+  )
+
+  return is_vec_colliding_cell(top_left)
+   or is_vec_colliding_cell(top_right)
+   or is_vec_colliding_cell(bottom_right)
+   or is_vec_colliding_cell(bottom_left)
 end
 function require_game_objects()
     local objects = {}
@@ -191,15 +229,16 @@ function to_string(any)
   return "unkown" -- should never show
 end
 function new_vec(x, y)
-    return {
-        x = x,
-        y = y,
-    }
+  return {
+    x = x,
+    y = y,
+    equal = function(self, other) return self.x == other.x and self.y == other.y end
+  }
 end
 gameobjects = require_game_objects()
 
 local player = gameobjects:new("player")
-player:add_component(new_transform_comp(1 * 8, 0))
+player:add_component(new_transform_comp(1 * 8, 0, 8, 8))
 player:add_component(new_sprite_comp({
   animations = {
     ["idle"] = {64} ,
@@ -214,6 +253,7 @@ cam:add_component(new_transform_comp(0, 0))
 cam:add_component(new_follow_comp({ target = player }))
 
 function _init()
+  printh('', 'log', true);
   gameobjects:init()
 end
 
@@ -269,8 +309,10 @@ __gfx__
 99999900999999000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 90990900909900900000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 __gff__
+0001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 __map__
-0202020202020202020202020202020202020202020202020202020202020202020202020202020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+0102020202020202020202020202020202020202020202020202020202020202020202020202020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 0202020202020202020202020202020202020202020202020202020202020202020202020202020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 0202020202020202020202020202020202020202020202020202020202020202020202020202020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 0202020202020202020202020202020202020202020202020202020202020202020202020202020000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
