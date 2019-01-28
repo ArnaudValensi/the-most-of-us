@@ -2,7 +2,7 @@ gameobjects = require_game_objects()
 
 local player = gameobjects:new("player")
 player:add_component(new_transform_comp(1 * 8, 0))
-player:add_component(new_sprite_comp({ sprite_number = 64 }))
+player:add_component(new_sprite_comp({ sprites = {64, 65} }))
 player:add_component(new_player_comp(3))
 
 local cam = gameobjects:new("camera")
