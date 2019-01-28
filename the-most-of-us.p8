@@ -5,13 +5,16 @@ function new_player_comp(speed)
   speed = speed or 1
   return {
     name = "player",
-    update = function(self)
-      local position = self.game_object:get_component("transform").position
 
-      if (btn(0)) then position.x -= speed end
-      if (btn(1)) then position.x += speed end
-      if (btn(2)) then position.y -= speed end
-      if (btn(3)) then position.y += speed end
+    init = function(self)
+      self.position = self.game_object:get_component("transform").position
+    end,
+
+    update = function(self)
+      if (btn(0)) then self.position.x -= speed end
+      if (btn(1)) then self.position.x += speed end
+      if (btn(2)) then self.position.y -= speed end
+      if (btn(3)) then self.position.y += speed end
     end,
   }
 end
@@ -21,12 +24,16 @@ function new_sprite_comp(options)
     sprite_number = options.sprite_number,
     width_in_cell = options.width_in_cell or 1,
     height_in_cell = options.height_in_cell or 1,
+
+    init = function(self)
+      self.position = self.game_object:get_component("transform").position
+    end,
+
     draw = function(self)
-      local transform = self.game_object:get_component("transform")
       spr(
         self.sprite_number,
-        transform.position.x,
-        transform.position.y,
+        self.position.x,
+        self.position.y,
         self.width_in_cell,
         self.height_in_cell
       )
@@ -67,6 +74,14 @@ function require_game_objects()
             return new_game_object
         end,
 
+        init = function()
+            for component in all(components) do
+                if component.init then
+                    component:init()
+                end
+            end
+        end,
+
         update = function()
             for component in all(components) do
                 if component.update then
@@ -101,6 +116,7 @@ player:add_component(new_player_comp(3))
 
 function _init()
   printh('\n== init ==', 'log', true)
+  gameobjects:init()
 end
 
 function _update()

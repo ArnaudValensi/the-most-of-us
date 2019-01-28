@@ -7,6 +7,7 @@ player:add_component(new_player_comp(3))
 
 function _init()
   printh('\n== init ==', 'log', true)
+  gameobjects:init()
 end
 
 function _update()

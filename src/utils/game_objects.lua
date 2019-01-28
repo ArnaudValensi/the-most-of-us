@@ -26,6 +26,14 @@ function require_game_objects()
             return new_game_object
         end,
 
+        init = function()
+            for component in all(components) do
+                if component.init then
+                    component:init()
+                end
+            end
+        end,
+
         update = function()
             for component in all(components) do
                 if component.update then
