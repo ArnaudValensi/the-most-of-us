@@ -16,5 +16,6 @@ end
 
 function _draw()
   cls()
+  map(0, 0, 0, 0, 128, 128)
   gameobjects:draw()
 end
