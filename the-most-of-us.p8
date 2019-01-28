@@ -18,13 +18,20 @@ function require_game_objects()
     local next_id = 0
 
     local game_objects = {
-        new = function(name)
+        new = function(self, name)
+            local object_components = {}
+
             new_game_object = {
                 id = next_id,
                 name = name,
                 add_component = function(self, component)
+                    add(components, component)
+                    object_components[component.name] = component
                     component.game_object = self
-                end
+                end,
+                get_component = function(self, name)
+                    return object_components[name]
+                end,
             }
 
             next_id += 1
@@ -35,7 +42,17 @@ function require_game_objects()
 
         update = function()
             for component in all(components) do
-                component:update()
+                if component.update then
+                    component:update()
+                end
+            end
+        end,
+
+        draw = function()
+            for component in all(components) do
+                if component.draw then
+                    component:draw()
+                end
             end
         end
     }
@@ -69,22 +86,56 @@ function new_vec(x, y)
         y = y,
     }
 end
-change_state = require_change_state()
-start_state = require_start_state()
+-- change_state = require_change_state()
+-- start_state = require_start_state()
 gameobjects = require_game_objects()
 
-state = start_state
+-- state = start_state
+
+function new_transform_comp(x, y)
+  return {
+    name = "transform",
+    position = new_vec(x, y),
+  }
+end
+
+function new_sprite_comp(options)
+  return {
+    name = "sprite",
+    sprite_number = options.sprite_number,
+    width_in_cell = options.width_in_cell or 1,
+    height_in_cell = options.height_in_cell or 1,
+    draw = function(self)
+      local transform = self.game_object:get_component("transform")
+      spr(
+        self.sprite_number,
+        transform.position.x,
+        transform.position.y,
+        self.width_in_cell,
+        self.height_in_cell
+      )
+    end,
+  }
+end
+
+local player = gameobjects:new("player")
+player:add_component(new_transform_comp(1 * 8, 0))
+player:add_component(new_sprite_comp({ sprite_number = 1 }))
 
 function _init()
-  state.on_start()
+  printh('\n== init ==', 'log', true)
+  -- state.on_start()
 end
 
 function _update()
-  state.update()
+  gameobjects:update()
+  -- state.update()
 end
 
 function _draw()
-  state.draw()
+  cls()
+  gameobjects:draw()
+  -- state.draw()
 end
 
 __gfx__
@@ -96,3 +147,8 @@ __gfx__
 00000000111555770000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 00000000115555570000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
 00000000155555550000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+
+__gff__
+__map__
+__sfx__
+__music__
