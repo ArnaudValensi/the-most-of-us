@@ -45,14 +45,14 @@ function new_line_of_sight_comp(segments)
     -- Wall endpoints
     local start, stop = wall.start, wall.stop
     -- Calculate light rays towards start and stop
-    local dist_light_to_start, dist_light_to_stop = start:sub(light_pos), stop:sub(light_pos)
+    local dist_light_to_start, dist_light_to_stop = start - light_pos, stop - light_pos
     -- Extend the rays until they intersect with the
     -- nearest boundary defined by light range
     -- (white points)
     local cs = light_range / max(abs(dist_light_to_start.x), abs(dist_light_to_start.y))
     local ce = light_range / max(abs(dist_light_to_stop.x), abs(dist_light_to_stop.y))
-    local projection_start = light_pos:add(dist_light_to_start:scalar_mul(cs))
-    local projection_stop = light_pos:add(dist_light_to_stop:scalar_mul(ce))
+    local projection_start = light_pos + dist_light_to_start * cs
+    local projection_stop = light_pos + dist_light_to_stop * ce
 
     return projection_start, projection_stop
   end

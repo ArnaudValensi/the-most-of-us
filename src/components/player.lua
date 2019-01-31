@@ -15,7 +15,7 @@ function new_player_comp(speed)
       local move_right = btn(1)
       local move_up = btn(2)
       local move_down = btn(3)
-      local new_position = new_vec(position.x, position.y)
+      local new_position = v(position.x, position.y)
 
       if move_left then
         new_position.x -= speed
@@ -28,7 +28,7 @@ function new_player_comp(speed)
       if move_up then new_position.y -= speed end
       if move_down then new_position.y += speed end
 
-      local want_move = not new_position:equal(position)
+      local want_move = new_position != position
       local has_moved = false
 
       if want_move and not is_transform_colliding_map_cell(new_position, size) then

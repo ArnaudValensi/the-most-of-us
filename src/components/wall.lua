@@ -11,27 +11,27 @@ function new_wall_comp()
 
       -- Top
       segments[1] = {
-        start = new_vec(position.x, position.y),
-        stop = new_vec(position.x + size.x - 1, position.y),
-        normal = new_vec(0, -1),
+        start = v(position.x, position.y),
+        stop = v(position.x + size.x - 1, position.y),
+        normal = v(0, -1),
       }
       -- Right
       segments[2] = {
-        start = new_vec(position.x + size.x - 1, position.y),
-        stop = new_vec(position.x + size.x - 1, position.y + size.y - 1),
-        normal = new_vec(1, 0),
+        start = v(position.x + size.x - 1, position.y),
+        stop = v(position.x + size.x - 1, position.y + size.y - 1),
+        normal = v(1, 0),
       }
       -- Bottom
       segments[3] = {
-        start = new_vec(position.x + size.x - 1, position.y + size.y - 1),
-        stop = new_vec(position.x, position.y + size.y - 1),
-        normal = new_vec(0, 1),
+        start = v(position.x + size.x - 1, position.y + size.y - 1),
+        stop = v(position.x, position.y + size.y - 1),
+        normal = v(0, 1),
       }
       -- Left
       segments[4] = {
-        start = new_vec(position.x, position.y + size.y - 1),
-        stop = new_vec(position.x, position.y),
-        normal = new_vec(-1, 0),
+        start = v(position.x, position.y + size.y - 1),
+        stop = v(position.x, position.y),
+        normal = v(-1, 0),
       }
     end,
 

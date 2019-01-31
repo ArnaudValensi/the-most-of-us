@@ -3,19 +3,19 @@ function is_transform_colliding_map_cell(position, size)
     return fget(mget(vec.x / 8, vec.y / 8), 0)
   end
 
-  local top_left = new_vec(
+  local top_left = v(
     position.x,
     position.y
   )
-  local top_right = new_vec(
+  local top_right = v(
     position.x + size.x - 1,
     position.y
   )
-  local bottom_right = new_vec(
+  local bottom_right = v(
     position.x + size.x - 1,
     position.y + size.y - 1
   )
-  local bottom_left = new_vec(
+  local bottom_left = v(
     position.x,
     position.y + size.y - 1
   )

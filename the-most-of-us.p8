@@ -71,14 +71,14 @@ function new_line_of_sight_comp(segments)
     -- Wall endpoints
     local start, stop = wall.start, wall.stop
     -- Calculate light rays towards start and stop
-    local dist_light_to_start, dist_light_to_stop = start:sub(light_pos), stop:sub(light_pos)
+    local dist_light_to_start, dist_light_to_stop = start - light_pos, stop - light_pos
     -- Extend the rays until they intersect with the
     -- nearest boundary defined by light range
     -- (white points)
     local cs = light_range / max(abs(dist_light_to_start.x), abs(dist_light_to_start.y))
     local ce = light_range / max(abs(dist_light_to_stop.x), abs(dist_light_to_stop.y))
-    local projection_start = light_pos:add(dist_light_to_start:scalar_mul(cs))
-    local projection_stop = light_pos:add(dist_light_to_stop:scalar_mul(ce))
+    local projection_start = light_pos + dist_light_to_start * cs
+    local projection_stop = light_pos + dist_light_to_stop * ce
 
     return projection_start, projection_stop
   end
@@ -146,7 +146,7 @@ function new_player_comp(speed)
       local move_right = btn(1)
       local move_up = btn(2)
       local move_down = btn(3)
-      local new_position = new_vec(position.x, position.y)
+      local new_position = v(position.x, position.y)
 
       if move_left then
         new_position.x -= speed
@@ -159,7 +159,7 @@ function new_player_comp(speed)
       if move_up then new_position.y -= speed end
       if move_down then new_position.y += speed end
 
-      local want_move = not new_position:equal(position)
+      local want_move = new_position != position
       local has_moved = false
 
       if want_move and not is_transform_colliding_map_cell(new_position, size) then
@@ -229,10 +229,10 @@ end
 function new_transform_comp(x, y, size_x, size_y)
   return {
     name = "transform",
-    position = new_vec(x, y),
-    size = new_vec(size_x or 0, size_y or 0),
+    position = v(x, y),
+    size = v(size_x or 0, size_y or 0),
     get_center_position = function(self)
-      return new_vec(
+      return v(
         self.position.x + self.size.x / 2,
         self.position.y + self.size.y / 2
       )
@@ -252,27 +252,27 @@ function new_wall_comp()
 
       -- Top
       segments[1] = {
-        start = new_vec(position.x, position.y),
-        stop = new_vec(position.x + size.x - 1, position.y),
-        normal = new_vec(0, -1),
+        start = v(position.x, position.y),
+        stop = v(position.x + size.x - 1, position.y),
+        normal = v(0, -1),
       }
       -- Right
       segments[2] = {
-        start = new_vec(position.x + size.x - 1, position.y),
-        stop = new_vec(position.x + size.x - 1, position.y + size.y - 1),
-        normal = new_vec(1, 0),
+        start = v(position.x + size.x - 1, position.y),
+        stop = v(position.x + size.x - 1, position.y + size.y - 1),
+        normal = v(1, 0),
       }
       -- Bottom
       segments[3] = {
-        start = new_vec(position.x + size.x - 1, position.y + size.y - 1),
-        stop = new_vec(position.x, position.y + size.y - 1),
-        normal = new_vec(0, 1),
+        start = v(position.x + size.x - 1, position.y + size.y - 1),
+        stop = v(position.x, position.y + size.y - 1),
+        normal = v(0, 1),
       }
       -- Left
       segments[4] = {
-        start = new_vec(position.x, position.y + size.y - 1),
-        stop = new_vec(position.x, position.y),
-        normal = new_vec(-1, 0),
+        start = v(position.x, position.y + size.y - 1),
+        stop = v(position.x, position.y),
+        normal = v(-1, 0),
       }
     end,
 
@@ -301,19 +301,19 @@ function is_transform_colliding_map_cell(position, size)
     return fget(mget(vec.x / 8, vec.y / 8), 0)
   end
 
-  local top_left = new_vec(
+  local top_left = v(
     position.x,
     position.y
   )
-  local top_right = new_vec(
+  local top_right = v(
     position.x + size.x - 1,
     position.y
   )
-  local bottom_right = new_vec(
+  local bottom_right = v(
     position.x + size.x - 1,
     position.y + size.y - 1
   )
-  local bottom_left = new_vec(
+  local bottom_left = v(
     position.x,
     position.y + size.y - 1
   )
@@ -416,16 +416,60 @@ function to_string(any)
   end
   return "unkown" -- should never show
 end
-function new_vec(x, y)
-  return {
-    x = x,
-    y = y,
-    equal = function(self, other) return self.x == other.x and self.y == other.y end,
-    add = function(self, other) return new_vec(self.x + other.x, self.y + other.y) end,
-    sub = function(self, other) return new_vec(self.x - other.x, self.y - other.y) end,
-    scalar_mul = function(self, n) return new_vec(self.x * n, self.y * n) end,
-    to_string = function(self) return '('..self.x..', '..self.y..')' end
-  }
+vec={}
+function vec:__add(v2)
+ return v(self.x+v2.x,self.y+v2.y)
+end
+function vec:__sub(v2)
+ return v(self.x-v2.x,self.y-v2.y)
+end
+function vec:__mul(a)
+ return v(self.x*a,self.y*a)
+end
+function vec:__pow(v2)
+ return self.x*v2.x+self.y*v2.y
+end
+function vec:__unm()
+ return v(-self.x,-self.y)
+end
+function vec:__eq(v2)
+  return self.x==v2.x and self.y==v2.y
+ end
+-- this is actually length-squared
+-- easier to calculate, good enough
+function vec:__len()
+ return self.x*self.x+self.y*self.y
+end
+-- normalized vector
+function vec:norm()
+ return self*(1/sqrt(#self))
+end
+-- rotated 90-deg clockwise
+function vec:rotcw()
+ return v(-self.y,self.x)
+end
+-- force coordinates to
+-- integers
+function vec:ints()
+ return v(flr(self.x),flr(self.y))
+end
+-- tostring method (uses __call
+-- for token-saving, dirty,
+-- i know)
+function vec:__call()
+ return self.x..","..self.y
+end
+-- has to be there so
+-- our metatable works
+-- for both operators
+-- and methods
+vec.__index=vec
+
+-- creates a new vector
+function v(x,y)
+ return setmetatable(
+  {x=x,y=y},vec
+ )
 end
 gameobjects = require_game_objects()
 
