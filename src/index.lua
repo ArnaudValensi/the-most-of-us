@@ -41,4 +41,20 @@ function _draw()
   map(0, 0, 0, 0, 128, 128)
   gameobjects:draw()
   gameobjects:late_draw()
+  draw_selected_wall()
+end
+
+function draw_selected_wall()
+  for wall in all(g_walls) do
+    -- Draw wall.
+    line(wall.start.x, wall.start.y, wall.stop.x, wall.stop.y, 8)
+    -- Draw normal.
+    line(
+      wall.start.x + (wall.stop.x - wall.start.x) / 2,
+      wall.start.y + (wall.stop.y - wall.start.y) / 2,
+      wall.start.x + (wall.stop.x - wall.start.x) / 2 + wall.normal.x,
+      wall.start.y + (wall.stop.y - wall.start.y) / 2 + wall.normal.y,
+      7
+    )
+  end
 end

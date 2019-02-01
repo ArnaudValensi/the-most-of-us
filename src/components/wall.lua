@@ -39,29 +39,13 @@ function new_wall_comp(player)
     end,
 
     update = function(self)
-      local segment = segments[4]
-      local player_position = self.player:get_center_position()
-      local player_direction = player_position - segment.start
-      local x, y = player_direction.x * segment.normal.x, player_direction.y * segment.normal.y
-      local is_player_front = max(x, y) > 0
-
-      printh('player_direction(): '..player_direction());
-      printh('x, y: '..x..', '..y);
-      printh('is_player_front: '..to_string(is_player_front));
-    end,
-
-    late_draw = function(self)
       for segment in all(segments) do
-        -- Draw segment.
-        line(segment.start.x, segment.start.y, segment.stop.x, segment.stop.y, 8)
-        -- Draw normal.
-        line(
-          segment.start.x + (segment.stop.x - segment.start.x) / 2,
-          segment.start.y + (segment.stop.y - segment.start.y) / 2,
-          segment.start.x + (segment.stop.x - segment.start.x) / 2 + segment.normal.x,
-          segment.start.y + (segment.stop.y - segment.start.y) / 2 + segment.normal.y,
-          7
-        )
+        local player_position = self.player:get_center_position()
+        local player_direction = player_position - segment.start
+        local x, y = player_direction.x * segment.normal.x, player_direction.y * segment.normal.y
+        local is_player_front = max(x, y) > 0
+
+        if (is_player_front) add(g_walls, segment)
       end
     end,
 

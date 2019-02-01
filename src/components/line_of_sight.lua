@@ -180,10 +180,12 @@ function new_line_of_sight_comp(segments)
       -- Light position and range
       local light_pos = self.transform:get_center_position()
       local light_range = 64
-      local wall = self.segments[3]
 
       color(1)
-      compute_wall_shadow(light_pos, light_range, wall)
+
+      for wall in all(g_walls) do
+        compute_wall_shadow(light_pos, light_range, wall)
+      end
 
       printh('cpu: '..flr(stat(1)*100))
     end,

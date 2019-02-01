@@ -203,10 +203,12 @@ function new_line_of_sight_comp(segments)
       -- Light position and range
       local light_pos = self.transform:get_center_position()
       local light_range = 64
-      local wall = self.segments[3]
 
       color(1)
-      compute_wall_shadow(light_pos, light_range, wall)
+
+      for wall in all(g_walls) do
+        compute_wall_shadow(light_pos, light_range, wall)
+      end
 
       printh('cpu: '..flr(stat(1)*100))
     end,
@@ -363,29 +365,13 @@ function new_wall_comp(player)
     end,
 
     update = function(self)
-      local segment = segments[4]
-      local player_position = self.player:get_center_position()
-      local player_direction = player_position - segment.start
-      local x, y = player_direction.x * segment.normal.x, player_direction.y * segment.normal.y
-      local is_player_front = max(x, y) > 0
-
-      printh('player_direction(): '..player_direction());
-      printh('x, y: '..x..', '..y);
-      printh('is_player_front: '..to_string(is_player_front));
-    end,
-
-    late_draw = function(self)
       for segment in all(segments) do
-        -- Draw segment.
-        line(segment.start.x, segment.start.y, segment.stop.x, segment.stop.y, 8)
-        -- Draw normal.
-        line(
-          segment.start.x + (segment.stop.x - segment.start.x) / 2,
-          segment.start.y + (segment.stop.y - segment.start.y) / 2,
-          segment.start.x + (segment.stop.x - segment.start.x) / 2 + segment.normal.x,
-          segment.start.y + (segment.stop.y - segment.start.y) / 2 + segment.normal.y,
-          7
-        )
+        local player_position = self.player:get_center_position()
+        local player_direction = player_position - segment.start
+        local x, y = player_direction.x * segment.normal.x, player_direction.y * segment.normal.y
+        local is_player_front = max(x, y) > 0
+
+        if (is_player_front) add(g_walls, segment)
       end
     end,
 
@@ -612,6 +598,22 @@ function _draw()
   map(0, 0, 0, 0, 128, 128)
   gameobjects:draw()
   gameobjects:late_draw()
+  draw_selected_wall()
+end
+
+function draw_selected_wall()
+  for wall in all(g_walls) do
+    -- Draw wall.
+    line(wall.start.x, wall.start.y, wall.stop.x, wall.stop.y, 8)
+    -- Draw normal.
+    line(
+      wall.start.x + (wall.stop.x - wall.start.x) / 2,
+      wall.start.y + (wall.stop.y - wall.start.y) / 2,
+      wall.start.x + (wall.stop.x - wall.start.x) / 2 + wall.normal.x,
+      wall.start.y + (wall.stop.y - wall.start.y) / 2 + wall.normal.y,
+      7
+    )
+  end
 end
 
 __gfx__
