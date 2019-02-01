@@ -67,6 +67,11 @@ function new_line_of_sight_comp(segments)
     end
   end
 
+  function round_max_dist(dist, light_range)
+    if (dist > light_range - 0.01) return light_range
+    return dist
+  end
+
   function calculate_shadow_volume(light_pos, light_range, wall)
     -- Wall endpoints
     local start, stop = wall.start, wall.stop
@@ -80,10 +85,23 @@ function new_line_of_sight_comp(segments)
     local projection_start = light_pos + dist_light_to_start * cs
     local projection_stop = light_pos + dist_light_to_stop * ce
 
+    local dist_light_to_proj_start = projection_start - light_pos
+    local dist_light_to_proj_stop = projection_stop - light_pos
+    local max_dist_proj_start = max(abs(dist_light_to_proj_start.x), abs(dist_light_to_proj_start.y))
+    local max_dist_proj_stop = max(abs(dist_light_to_proj_stop.x), abs(dist_light_to_proj_stop.y))
+    max_dist_proj_start = round_max_dist(max_dist_proj_start, light_range)
+    max_dist_proj_stop = round_max_dist(max_dist_proj_stop, light_range)
+
+    printh('dist_light_to_proj_start(): '..dist_light_to_proj_start());
+    printh('dist_light_to_proj_stop(): '..dist_light_to_proj_stop());
+    printh('dist start: '..max_dist_proj_start);
+    printh('dist stop:'..max_dist_proj_stop);
+
     return projection_start, projection_stop
   end
 
   function debug_shadow(wall, projection_start, projection_stop)
+    -- printh('start | stop: '..projection_start()..' | '..projection_stop());
     circ(wall.stop.x, wall.stop.y, 2, 2) -- Red
     circ(projection_stop.x, projection_stop.y, 2, 2) -- Red
     circ(projection_start.x, projection_start.y, 2, 1) -- Blue
@@ -457,7 +475,7 @@ end
 -- for token-saving, dirty,
 -- i know)
 function vec:__call()
- return self.x..","..self.y
+ return self.x..', '..self.y
 end
 -- has to be there so
 -- our metatable works

@@ -39,7 +39,7 @@ end
 -- for token-saving, dirty,
 -- i know)
 function vec:__call()
- return self.x..","..self.y
+ return self.x..', '..self.y
 end
 -- has to be there so
 -- our metatable works
