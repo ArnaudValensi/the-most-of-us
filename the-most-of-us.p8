@@ -8,18 +8,25 @@ function new_follow_comp(options)
     smooth_speed = options.smooth_speed or 0.2,
 
     init = function(self)
-      self.target_position = self.target:get_component("transform").position
-      self.position = self.game_object:get_component("transform").position
+      self.target_transform = self.target:get_component("transform")
+      self.transform = self.game_object:get_component("transform")
     end,
 
     update = function(self)
-      local position = self.position
-      position.x = lerp(position.x, self.target_position.x, self.smooth_speed)
-      position.y = lerp(position.y, self.target_position.y, self.smooth_speed)
+      -- local position = self.transform.position
+      -- local target_position = self.target_transform:get_center_position()
+      -- position.x = lerp(position.x, self.target_position.x, self.smooth_speed)
+      -- position.y = lerp(position.y, self.target_position.y, self.smooth_speed)
 
+      -- camera(
+      --   self.position.x - 64,
+      --   self.position.y - 64
+      -- )
+
+      local target_position = self.target_transform:get_center_position()
       camera(
-        self.position.x - 64,
-        self.position.y - 64
+        target_position.x - 64,
+        target_position.y - 64
       )
     end,
   }
@@ -109,14 +116,14 @@ function new_line_of_sight_comp(segments)
     local dist_light_to_proj_start = projection_start - light_pos
     local dist_light_to_proj_stop = projection_stop - light_pos
 
-    printh('dist_light_to_proj_start(): '..dist_light_to_proj_start());
-    printh('dist_light_to_proj_stop(): '..dist_light_to_proj_stop());
+    -- printh('dist_light_to_proj_start(): '..dist_light_to_proj_start());
+    -- printh('dist_light_to_proj_stop(): '..dist_light_to_proj_stop());
 
     local start_side = get_side(dist_light_to_proj_start, light_range)
     local stop_side = get_side(dist_light_to_proj_stop, light_range)
 
-    printh('start_side(): '..start_side());
-    printh('stop_side(): '..stop_side());
+    -- printh('start_side(): '..start_side());
+    -- printh('stop_side(): '..stop_side());
 
     local points = {
       projection_start,
@@ -135,9 +142,9 @@ function new_line_of_sight_comp(segments)
     local stop_side_index = get_side_index(stop_side)
     local sides = bor(start_side_index, stop_side_index)
 
-    printh('start_side_index: '..start_side_index);
-    printh('stop_side_index: '..stop_side_index);
-    printh('sides: '..sides);
+    -- printh('start_side_index: '..start_side_index);
+    -- printh('stop_side_index: '..stop_side_index);
+    -- printh('sides: '..sides);
 
     if (band(sides, 5) == 5) then
       --todo: half of the condition is useless when we only cast shadow on the player facing
@@ -186,7 +193,7 @@ function new_line_of_sight_comp(segments)
   function compute_wall_shadow(light_pos, light_range, wall)
     local projection_start, projection_stop, points = calculate_shadow_volume(light_pos, light_range, wall)
 
-    debug_shadow(wall, projection_start, projection_stop)
+    -- debug_shadow(wall, projection_start, projection_stop)
 
     draw_polygon(points)
   end
@@ -205,9 +212,10 @@ function new_line_of_sight_comp(segments)
     late_draw = function(self)
       -- Light position and range
       local light_pos = self.transform:get_center_position()
-      local light_range = 50
+      local light_range = 64
       local wall = self.segments[3]
 
+      color(1)
       compute_wall_shadow(light_pos, light_range, wall)
     end,
   }
