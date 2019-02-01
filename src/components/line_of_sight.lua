@@ -184,6 +184,8 @@ function new_line_of_sight_comp(segments)
 
       color(1)
       compute_wall_shadow(light_pos, light_range, wall)
+
+      printh('cpu: '..flr(stat(1)*100))
     end,
   }
 end
