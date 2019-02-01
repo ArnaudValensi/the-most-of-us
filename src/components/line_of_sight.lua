@@ -48,19 +48,17 @@ function new_line_of_sight_comp(segments)
     return 0
   end
 
-  function get_side(pos, light_range)
+  function get_side_index(pos, light_range)
     local x = get_value_side(pos.x, light_range)
     local y = get_value_side(pos.y, light_range)
+    local side_index = 0
 
-    -- printh('x, y: '..x..', '..y);
+    if (x == -1) side_index += 1 --left
+    if (y == -1) side_index += 2 --top
+    if (x == 1) side_index += 4 --right
+    if (y == 1) side_index += 8 --bottom
 
-    -- top-right: 1, -1
-    -- top: 0, -1
-    -- bottom: 0, 1
-    -- right: 1, 0
-    -- left: -1, 0
-
-    return v(x, y)
+    return side_index
   end
 
   function calculate_shadow_volume(light_pos, light_range, wall)
@@ -78,25 +76,15 @@ function new_line_of_sight_comp(segments)
 
     local dist_light_to_proj_start = projection_start - light_pos
     local dist_light_to_proj_stop = projection_stop - light_pos
-    -- local max_dist_proj_start = max(abs(dist_light_to_proj_start.x), abs(dist_light_to_proj_start.y))
-    -- local max_dist_proj_stop = max(abs(dist_light_to_proj_stop.x), abs(dist_light_to_proj_stop.y))
-    -- max_dist_proj_start = round_max_dist(max_dist_proj_start, light_range)
-    -- max_dist_proj_stop = round_max_dist(max_dist_proj_stop, light_range)
 
     printh('dist_light_to_proj_start(): '..dist_light_to_proj_start());
     printh('dist_light_to_proj_stop(): '..dist_light_to_proj_stop());
-    -- printh('dist start: '..max_dist_proj_start);
-    -- printh('dist stop:'..max_dist_proj_stop);
 
-    local side_proj_start = get_side(dist_light_to_proj_start, light_range)
-    local side_proj_stop = get_side(dist_light_to_proj_stop, light_range)
+    local start_side_index = get_side_index(dist_light_to_proj_start, light_range)
+    local stop_side_index = get_side_index(dist_light_to_proj_stop, light_range)
 
-    printh('side_proj_start(): '..side_proj_start());
-    printh('side_proj_stop(): '..side_proj_stop());
-
-    if side_proj_start.y == side_proj_stop.y or side_proj_start.x == side_proj_stop.x then
-      --pass
-    end
+    printh('start_side_index: '..start_side_index);
+    printh('stop_side_index: '..stop_side_index);
 
     return projection_start, projection_stop
   end
