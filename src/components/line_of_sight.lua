@@ -14,7 +14,7 @@ function new_line_of_sight_comp(segments)
     local step = 1
 
     if by < ay then
-     --switch direction and tables
+     -- switch direction and tables
      right_points, step = left_points, -1
     end
     for y = ay, by, step do
@@ -41,9 +41,26 @@ function new_line_of_sight_comp(segments)
     end
   end
 
-  function round_max_dist(dist, light_range)
-    if (dist > light_range - 0.01) return light_range
-    return dist
+  function get_value_side(value, light_range)
+    local threshold = light_range - 0.01
+    if (value > threshold) return 1
+    if (value < -threshold) return -1
+    return 0
+  end
+
+  function get_side(pos, light_range)
+    local x = get_value_side(pos.x, light_range)
+    local y = get_value_side(pos.y, light_range)
+
+    -- printh('x, y: '..x..', '..y);
+
+    -- top-right: 1, -1
+    -- top: 0, -1
+    -- bottom: 0, 1
+    -- right: 1, 0
+    -- left: -1, 0
+
+    return v(x, y)
   end
 
   function calculate_shadow_volume(light_pos, light_range, wall)
@@ -61,15 +78,25 @@ function new_line_of_sight_comp(segments)
 
     local dist_light_to_proj_start = projection_start - light_pos
     local dist_light_to_proj_stop = projection_stop - light_pos
-    local max_dist_proj_start = max(abs(dist_light_to_proj_start.x), abs(dist_light_to_proj_start.y))
-    local max_dist_proj_stop = max(abs(dist_light_to_proj_stop.x), abs(dist_light_to_proj_stop.y))
-    max_dist_proj_start = round_max_dist(max_dist_proj_start, light_range)
-    max_dist_proj_stop = round_max_dist(max_dist_proj_stop, light_range)
+    -- local max_dist_proj_start = max(abs(dist_light_to_proj_start.x), abs(dist_light_to_proj_start.y))
+    -- local max_dist_proj_stop = max(abs(dist_light_to_proj_stop.x), abs(dist_light_to_proj_stop.y))
+    -- max_dist_proj_start = round_max_dist(max_dist_proj_start, light_range)
+    -- max_dist_proj_stop = round_max_dist(max_dist_proj_stop, light_range)
 
     printh('dist_light_to_proj_start(): '..dist_light_to_proj_start());
     printh('dist_light_to_proj_stop(): '..dist_light_to_proj_stop());
-    printh('dist start: '..max_dist_proj_start);
-    printh('dist stop:'..max_dist_proj_stop);
+    -- printh('dist start: '..max_dist_proj_start);
+    -- printh('dist stop:'..max_dist_proj_stop);
+
+    local side_proj_start = get_side(dist_light_to_proj_start, light_range)
+    local side_proj_stop = get_side(dist_light_to_proj_stop, light_range)
+
+    printh('side_proj_start(): '..side_proj_start());
+    printh('side_proj_stop(): '..side_proj_stop());
+
+    if side_proj_start.y == side_proj_stop.y or side_proj_start.x == side_proj_stop.x then
+      --pass
+    end
 
     return projection_start, projection_stop
   end
