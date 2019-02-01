@@ -13,16 +13,6 @@ function new_follow_comp(options)
     end,
 
     update = function(self)
-      -- local position = self.transform.position
-      -- local target_position = self.target_transform:get_center_position()
-      -- position.x = lerp(position.x, self.target_position.x, self.smooth_speed)
-      -- position.y = lerp(position.y, self.target_position.y, self.smooth_speed)
-
-      -- camera(
-      --   self.position.x - 64,
-      --   self.position.y - 64
-      -- )
-
       local target_position = self.target_transform:get_center_position()
       camera(
         target_position.x - 64,
