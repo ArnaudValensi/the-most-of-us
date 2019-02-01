@@ -322,7 +322,7 @@ function new_transform_comp(x, y, size_x, size_y)
     end
   }
 end
-function new_wall_comp()
+function new_wall_comp(player)
   local segments = {}
 
   return {
@@ -347,6 +347,7 @@ function new_wall_comp()
       }
       -- Bottom
       segments[3] = {
+
         start = v(position.x + size.x - 1, position.y + size.y - 1),
         stop = v(position.x, position.y + size.y - 1),
         normal = v(0, 1),
@@ -357,6 +358,20 @@ function new_wall_comp()
         stop = v(position.x, position.y),
         normal = v(-1, 0),
       }
+
+      self.player = player:get_component("transform")
+    end,
+
+    update = function(self)
+      local segment = segments[4]
+      local player_position = self.player:get_center_position()
+      local player_direction = player_position - segment.start
+      local x, y = player_direction.x * segment.normal.x, player_direction.y * segment.normal.y
+      local is_player_front = max(x, y) > 0
+
+      printh('player_direction(): '..player_direction());
+      printh('x, y: '..x..', '..y);
+      printh('is_player_front: '..to_string(is_player_front));
     end,
 
     late_draw = function(self)
@@ -575,7 +590,7 @@ cam:add_component(new_follow_comp({ target = player }))
 
 local wall = gameobjects:new("wall1")
 wall:add_component(new_transform_comp(8 * 8, 9 * 8, 8, 8))
-wall:add_component(new_wall_comp())
+wall:add_component(new_wall_comp(player))
 wall:add_component(new_sprite_comp({
   animations = { ["idle"] = {4} },
   default = "idle",

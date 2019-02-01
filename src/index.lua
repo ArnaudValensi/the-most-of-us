@@ -19,7 +19,7 @@ cam:add_component(new_follow_comp({ target = player }))
 
 local wall = gameobjects:new("wall1")
 wall:add_component(new_transform_comp(8 * 8, 9 * 8, 8, 8))
-wall:add_component(new_wall_comp())
+wall:add_component(new_wall_comp(player))
 wall:add_component(new_sprite_comp({
   animations = { ["idle"] = {4} },
   default = "idle",
