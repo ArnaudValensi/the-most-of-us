@@ -109,6 +109,7 @@ function new_line_of_sight_comp(segments)
     local start_side_index = get_side_index(dist_light_to_proj_start, light_range)
     local stop_side_index = get_side_index(dist_light_to_proj_stop, light_range)
     local sides = start_side_index + stop_side_index
+    -- local sides = bor(start_side_index, stop_side_index)
 
     printh('start_side_index: '..start_side_index);
     printh('stop_side_index: '..stop_side_index);
@@ -121,7 +122,33 @@ function new_line_of_sight_comp(segments)
       projection_stop
     }
 
-    if (sides == 3) add(points, v(-light_range, -light_range) + light_pos)
+    -- if () return points
+
+    if (sides == 3) then
+      add(points, v(-light_range, -light_range) + light_pos)
+    elseif (sides == 6) then
+      add(points, v(light_range, -light_range) + light_pos)
+    elseif (sides == 9) then
+      add(points, v(-light_range, light_range) + light_pos)
+    elseif (sides == 12) then
+      add(points, v(light_range, light_range) + light_pos)
+    elseif (sides == 5) then
+      if (dist_light_to_proj_start.y < 0) then
+        add(points, v(-light_range, -light_range) + light_pos)
+        add(points, v(light_range, -light_range) + light_pos)
+      else
+        add(points, v(light_range, light_range) + light_pos)
+        add(points, v(-light_range, light_range) + light_pos)
+      end
+    elseif (sides == 10) then
+      if (dist_light_to_proj_start.x < 0) then
+        add(points, v(-light_range, light_range) + light_pos)
+        add(points, v(-light_range, -light_range) + light_pos)
+      else
+        add(points, v(light_range, -light_range) + light_pos)
+        add(points, v(light_range, light_range) + light_pos)
+      end
+    end
     -- if (sides == 3) add(points, v(projection_stop.x, projection_start.y))
 
 
