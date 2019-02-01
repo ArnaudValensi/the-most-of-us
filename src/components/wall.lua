@@ -36,18 +36,18 @@ function new_wall_comp()
     end,
 
     late_draw = function(self)
-      -- for segment in all(segments) do
-      --   -- Draw segment.
-      --   line(segment.start.x, segment.start.y, segment.stop.x, segment.stop.y, 8)
-      --   -- Draw normal.
-      --   line(
-      --     segment.start.x + (segment.stop.x - segment.start.x) / 2,
-      --     segment.start.y + (segment.stop.y - segment.start.y) / 2,
-      --     segment.start.x + (segment.stop.x - segment.start.x) / 2 + segment.normal.x,
-      --     segment.start.y + (segment.stop.y - segment.start.y) / 2 + segment.normal.y,
-      --     7
-      --   )
-      -- end
+      for segment in all(segments) do
+        -- Draw segment.
+        line(segment.start.x, segment.start.y, segment.stop.x, segment.stop.y, 8)
+        -- Draw normal.
+        line(
+          segment.start.x + (segment.stop.x - segment.start.x) / 2,
+          segment.start.y + (segment.stop.y - segment.start.y) / 2,
+          segment.start.x + (segment.stop.x - segment.start.x) / 2 + segment.normal.x,
+          segment.start.y + (segment.stop.y - segment.start.y) / 2 + segment.normal.y,
+          7
+        )
+      end
     end,
 
     get_segments = function(self)

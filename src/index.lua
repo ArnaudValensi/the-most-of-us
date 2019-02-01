@@ -1,4 +1,5 @@
 gameobjects = require_game_objects()
+g_walls = {}
 
 local player = gameobjects:new("player")
 player:add_component(new_transform_comp(10 * 8, 10 * 8, 8, 8))
@@ -31,6 +32,7 @@ function _init()
 end
 
 function _update()
+  g_walls = {}
   gameobjects:update()
 end
 
