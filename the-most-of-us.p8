@@ -108,11 +108,24 @@ function new_line_of_sight_comp(segments)
 
     local start_side_index = get_side_index(dist_light_to_proj_start, light_range)
     local stop_side_index = get_side_index(dist_light_to_proj_stop, light_range)
+    local sides = start_side_index + stop_side_index
 
     printh('start_side_index: '..start_side_index);
     printh('stop_side_index: '..stop_side_index);
+    printh('sides: '..sides);
 
-    return projection_start, projection_stop
+    local points = {
+      projection_start,
+      wall.start,
+      wall.stop,
+      projection_stop
+    }
+
+    if (sides == 3) add(points, v(-light_range, -light_range) + light_pos)
+    -- if (sides == 3) add(points, v(projection_stop.x, projection_start.y))
+
+
+    return projection_start, projection_stop, points
   end
 
   function debug_shadow(wall, projection_start, projection_stop)
@@ -129,16 +142,11 @@ function new_line_of_sight_comp(segments)
   end
 
   function compute_wall_shadow(light_pos, light_range, wall)
-    local projection_start, projection_stop = calculate_shadow_volume(light_pos, light_range, wall)
+    local projection_start, projection_stop, points = calculate_shadow_volume(light_pos, light_range, wall)
 
     debug_shadow(wall, projection_start, projection_stop)
 
-    draw_polygon({
-      wall.stop,
-      projection_stop,
-      projection_start,
-      wall.start
-    })
+    draw_polygon(points)
   end
 
   return {
