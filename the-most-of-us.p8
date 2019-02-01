@@ -133,24 +133,13 @@ function new_line_of_sight_comp(segments)
 
     local start_side_index = get_side_index(start_side)
     local stop_side_index = get_side_index(stop_side)
-    local sides = start_side_index + stop_side_index
-    -- local sides = bor(start_side_index, stop_side_index)
+    local sides = bor(start_side_index, stop_side_index)
 
     printh('start_side_index: '..start_side_index);
     printh('stop_side_index: '..stop_side_index);
     printh('sides: '..sides);
 
-    -- if () return points
-
-    if (band(sides, 3) == 3) then
-      add(points, v(-light_range, -light_range) + light_pos)
-    elseif (band(sides, 6) == 6) then
-      add(points, v(light_range, -light_range) + light_pos)
-    elseif (band(sides, 9) == 9) then
-      add(points, v(-light_range, light_range) + light_pos)
-    elseif (band(sides, 12) == 12) then
-      add(points, v(light_range, light_range) + light_pos)
-    elseif (band(sides, 5) == 5) then
+    if (band(sides, 5) == 5) then
       --todo: half of the condition is useless when we only cast shadow on the player facing
       --walls
       if (dist_light_to_proj_start.y < 0) then
@@ -168,9 +157,15 @@ function new_line_of_sight_comp(segments)
         add(points, v(light_range, light_range) + light_pos)
         add(points, v(light_range, -light_range) + light_pos)
       end
+    elseif (band(sides, 3) == 3) then
+      add(points, v(-light_range, -light_range) + light_pos)
+    elseif (band(sides, 6) == 6) then
+      add(points, v(light_range, -light_range) + light_pos)
+    elseif (band(sides, 9) == 9) then
+      add(points, v(-light_range, light_range) + light_pos)
+    elseif (band(sides, 12) == 12) then
+      add(points, v(light_range, light_range) + light_pos)
     end
-    -- if (sides == 3) add(points, v(projection_stop.x, projection_start.y))
-
 
     return projection_start, projection_stop, points
   end
