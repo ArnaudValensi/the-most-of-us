@@ -142,15 +142,17 @@ function new_line_of_sight_comp(segments)
 
     -- if () return points
 
-    if (sides == 3) then
+    if (band(sides, 3) == 3) then
       add(points, v(-light_range, -light_range) + light_pos)
-    elseif (sides == 6) then
+    elseif (band(sides, 6) == 6) then
       add(points, v(light_range, -light_range) + light_pos)
-    elseif (sides == 9) then
+    elseif (band(sides, 9) == 9) then
       add(points, v(-light_range, light_range) + light_pos)
-    elseif (sides == 12) then
+    elseif (band(sides, 12) == 12) then
       add(points, v(light_range, light_range) + light_pos)
-    elseif (sides == 5) then
+    elseif (band(sides, 5) == 5) then
+      --todo: half of the condition is useless when we only cast shadow on the player facing
+      --walls
       if (dist_light_to_proj_start.y < 0) then
         add(points, v(-light_range, -light_range) + light_pos)
         add(points, v(light_range, -light_range) + light_pos)
@@ -158,7 +160,7 @@ function new_line_of_sight_comp(segments)
         add(points, v(-light_range, light_range) + light_pos)
         add(points, v(light_range, light_range) + light_pos)
       end
-    elseif (sides == 10) then
+    elseif (band(sides, 10) == 10) then
       if (dist_light_to_proj_start.x < 0) then
         add(points, v(-light_range, light_range) + light_pos)
         add(points, v(-light_range, -light_range) + light_pos)
